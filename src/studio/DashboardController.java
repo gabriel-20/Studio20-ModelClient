@@ -5,36 +5,33 @@
  */
 package studio;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import studio.helper.Model;
-import com.jfoenix.controls.JFXTextField;
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.time.LocalDate;
 import java.time.MonthDay;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.ImageViewBuilder;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
-import javax.imageio.ImageIO;
+import studio.helper.Sales;
+
 
 /**
  * FXML Controller class
@@ -65,6 +62,16 @@ public class DashboardController implements Initializable {
     private void handleCloseDash(MouseEvent event) {
         System.exit(0);
     }
+    
+    @FXML
+    private TableView<Sales> table;
+    
+    
+//     @FXML 
+//     private TableColumn colOnlineH ;
+     
+     
+      private final ObservableList<Sales> data = FXCollections.observableArrayList();
 
     /**
      * Initializes the controller class.
@@ -98,6 +105,19 @@ public class DashboardController implements Initializable {
         totalamount.setText(model.totalamount+" $");
         totalhistory.setText(model.totalhistory+" $");
         
+        JsonArray jsonarray = model.sales;
+        for (int i = 0; i < jsonarray.size(); i++) {
+        JsonObject jsonobject = jsonarray.get(i).getAsJsonObject();
+        
+        String jData = jsonobject.get("date").getAsString();
+        String jSum = jsonobject.get("sum").getAsString();
+        String jHours = jsonobject.get("hours").getAsString();
+        data.add(new Sales(Integer.toString(i + 1), jData, jSum, jHours));
+}
+
+        
+        //data.add(new Sales("5", "10-02-2019", "1000$", "23:02:10"));
+        
 
         String imageUrl = "http:" + model.profilePicture;
 
@@ -118,7 +138,30 @@ public class DashboardController implements Initializable {
 
         calendar1.getChildren().add(root1); 
         calendar2.getChildren().add(root2); 
+        
+        TableColumn indexFieldCol = new TableColumn("#");
+        indexFieldCol.setMinWidth(100);
+        indexFieldCol.setCellValueFactory(new PropertyValueFactory<>("indexField"));
+        
+        TableColumn firstDayCol = new TableColumn("Day");
+        firstDayCol.setMinWidth(100);
+        firstDayCol.setCellValueFactory(new PropertyValueFactory<>("firstDay"));
+        
+        TableColumn lastSaleCol = new TableColumn("Sale");
+        lastSaleCol.setMinWidth(100);
+        lastSaleCol.setCellValueFactory(new PropertyValueFactory<>("lastSale"));
+        
+        TableColumn lastHourCol = new TableColumn("Hours");
+        lastHourCol.setMinWidth(100);
+        lastHourCol.setCellValueFactory(new PropertyValueFactory<>("lastHour"));
+
+        table.setItems(data);
+        table.getColumns().addAll(indexFieldCol, firstDayCol, lastSaleCol, lastHourCol);
 
     }
+    
+    
+
+
 
 }

@@ -51,7 +51,7 @@ public class JsonDeserializerLoginResponse implements JsonDeserializer<LoginResp
 	    
             
             JsonArray sales = loginResponseJson.get("sales").getAsJsonArray();
-            //System.out.println(sales);
+            System.out.println(sales);
             
 	    LoginResponse loginresponse = new LoginResponse();
 	    loginresponse.setSuccess(success);
