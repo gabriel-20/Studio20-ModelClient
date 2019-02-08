@@ -9,6 +9,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import studio.helper.Model;
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
@@ -31,6 +32,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
 import studio.helper.Sales;
+import org.controlsfx.control.Notifications;
 
 
 /**
@@ -55,8 +57,25 @@ public class DashboardController implements Initializable {
     @FXML
     private ImageView profilePicture;
     
-     @FXML
+    @FXML
     private AnchorPane calendar1,calendar2;
+     
+    @FXML
+    private void testBtn(MouseEvent event) {
+        
+        Notifications.create()
+                .title("Studio20")
+                .text("Hello from Great Leader Vasile!!")
+                .showWarning();
+    }
+    
+    @FXML 
+    public void execApp(MouseEvent event) throws IOException{
+    
+        System.out.println("Click!");
+        Process process = new ProcessBuilder("C:\\Program Files\\JasminCam\\App\\JCam.exe").start();
+
+    }
 
     @FXML
     private void handleCloseDash(MouseEvent event) {

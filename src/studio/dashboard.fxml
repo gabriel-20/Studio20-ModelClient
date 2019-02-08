@@ -198,7 +198,7 @@
                   <Font name="System Bold" size="24.0" />
                </font>
             </Label>
-            <JFXButton layoutX="645.0" layoutY="41.0" prefHeight="37.0" prefWidth="131.0" style="-fx-background-color: #e72523; -fx-border-color: #000000;" text="LIVEJASMIN" textFill="WHITE">
+            <JFXButton layoutX="645.0" layoutY="41.0" onMouseClicked="#execApp" prefHeight="37.0" prefWidth="131.0" style="-fx-background-color: #e72523; -fx-border-color: #000000;" text="LIVEJASMIN" textFill="WHITE">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
@@ -213,6 +213,7 @@
                   <Font name="System Bold" size="18.0" />
                </font>
             </Label>
+            <JFXButton layoutX="685.0" layoutY="106.0" onMouseClicked="#testBtn" text="test" />
          </children>
       </AnchorPane>
    </children>
