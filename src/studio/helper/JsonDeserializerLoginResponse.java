@@ -34,14 +34,16 @@ public class JsonDeserializerLoginResponse implements JsonDeserializer<LoginResp
             if (success){
                 JsonObject dataFromApi = loginResponseJson.get("data").getAsJsonObject();
             
-            String profilePicture = "//www.google.com/url?sa=i&source=images&cd=&ved=2ahUKEwj8vPXHrZjgAhXPyKQKHYZvCyEQjRx6BAgBEAU&url=https%3A%2F%2Fplanetbotanix.com%2Ftestimonials%2Fconnie-h%2Ffemale-avatar-1-300x300%2F&psig=AOvVaw11KID46vMwj4XpcE4njPS3&ust=1549035630454379";
+            String profilePicture;
 
             String modelname = dataFromApi.get("sync_Modelname").getAsString();
             
             /** @TODO fix error if no avatar */
-            if(dataFromApi.get("data_profilePictureUrl").getAsString() instanceof  String){
-                profilePicture = dataFromApi.get("data_profilePictureUrl").getAsString();
-            } 
+            if(dataFromApi.get("data_profilePictureUrl").isJsonNull()){
+                profilePicture = "//planetbotanix.com/wp-content/uploads/2017/08/Female-Avatar-1-300x300.jpg";
+            } else {
+                    profilePicture = dataFromApi.get("data_profilePictureUrl").getAsString();
+            }
             
             
             JsonObject total = loginResponseJson.get("total").getAsJsonObject();

@@ -139,7 +139,9 @@ public class DashboardController implements Initializable {
         
 
         String imageUrl = "http:" + model.profilePicture;
-
+        
+        System.out.println(imageUrl);
+        
         Image image = new Image(imageUrl);
         profilePicture.setImage(image);
         

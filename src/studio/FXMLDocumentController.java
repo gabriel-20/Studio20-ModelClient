@@ -15,6 +15,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.reflect.TypeToken;
 import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.JFXToggleButton;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -30,8 +31,11 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -42,9 +46,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.effect.ColorAdjust;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 import static studio.helper.Global.LOGIN_URL;
 import static studio.helper.Global.RANDOM_MODELS;
 import studio.helper.Sales;
@@ -63,91 +71,146 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private Label label;
-    
+
     @FXML
-    private JFXTextField model1,model2,model3,model4,model5;
+    private JFXTextField model1, model2, model3, model4, model5;
 
     @FXML
     private JFXTextField user;
 
     @FXML
     private Button btn_login;
+    
+    @FXML
+    private ImageView imageLogo;
+    
+    @FXML
+    private AnchorPane debugwindow;
+    
+    @FXML
+    private Button togBtn;
 
     @FXML
     private void handleClose(MouseEvent event) {
         System.exit(0);
     }
+    
+    @FXML
+    private void handleToggle(MouseEvent event) {
+        
+             debugwindow.setVisible(false);
+    }
+
+    private String content;
+    
+    private Double str = -0.1;
+    private Double val = 0.0;
 
     @FXML
     void handleButtonAction(ActionEvent event) throws IOException {
 
+        ColorAdjust colorAdjust = new ColorAdjust();
+        
+        
         model = user.getText();
 
         if (model.length() > 0) {
 
             String url = LOGIN_URL;
-
-            String content = fetchContent(url, model);
-
-            System.out.println(content);
-
-            Gson gson = new GsonBuilder().registerTypeAdapter(LoginResponse.class, new JsonDeserializerLoginResponse())
-                    .serializeNulls().create();
-
-            LoginResponse loginResponse = gson.fromJson(content, new TypeToken<LoginResponse>() {
-            }.getType());
-
-            System.out.println(loginResponse);
-
-            if (loginResponse.getSuccess()) {
-
-                Model model = Model.getInstance();
-                model.modelname = loginResponse.getModelname();
-                model.profilePicture = loginResponse.getProfilePicture();
-                model.onlineHours = loginResponse.getOnlineHours();
-                model.totalamount = loginResponse.getTotalamount();
-                model.totalhistory = loginResponse.getTotalhistory();
-                model.sales = loginResponse.getSales();
-
-                try {
-                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("dashboard.fxml"));
-                    Parent rootl = (Parent) fxmlLoader.load();
-
-                    
-
-                    Stage stage = new Stage();
-                    stage.initStyle(StageStyle.UNDECORATED);
-                    stage.setTitle("Model Dashboard");
-                    
-                    //grab your root here
-                    rootl.setOnMousePressed(new EventHandler<MouseEvent>() {
-                        @Override
-                        public void handle(MouseEvent event) {
-                            xOffset = event.getSceneX();
-                            yOffset = event.getSceneY();
-                        }
-                    });
-
-                    //move around here
-                    rootl.setOnMouseDragged(new EventHandler<MouseEvent>() {
-                        @Override
-                        public void handle(MouseEvent event) {
-                            stage.setX(event.getScreenX() - xOffset);
-                            stage.setY(event.getScreenY() - yOffset);
-                        }
-                    });
-                    
-                    stage.setScene(new Scene(rootl));
-                    stage.show();
-
-                } catch (Exception e) {
-                    System.out.println("Error Screen!");
-                }
-            } else {
-            //System.exit(0);
             
-            System.out.println("Login Error!");
-            }
+            Timeline fiveSecondsWonder = new Timeline(new KeyFrame(Duration.seconds(0.05), new EventHandler<ActionEvent>() {
+
+                @Override
+                public void handle(ActionEvent event) {
+                    val = val + str;
+                    if (!( (val > -0.5) && (val <= -0.1) )){
+                        System.out.println("val="+val);
+                        System.out.println("str="+str);
+                        str = str * (-1);
+                        System.out.println("aici");
+                    }
+                    
+                    colorAdjust.setSaturation(val);
+                    if ( (val > -0.5) && (val < -0.1) ) {
+                        imageLogo.setEffect(colorAdjust);
+                    }
+                    System.out.println("this is called every "+ val +" seconds on UI thread");
+                    
+                }
+            }));
+            fiveSecondsWonder.setCycleCount(Timeline.INDEFINITE);
+            fiveSecondsWonder.play();
+
+            Task<Void> task = new Task<Void>() {
+                @Override
+                public Void call() throws Exception {
+                    
+                    
+
+                    content = fetchContent(url, model);
+                    System.out.println(content);
+
+                    return null;
+                }
+            };
+            task.setOnSucceeded(ee -> {
+                fiveSecondsWonder.stop();
+                Gson gson = new GsonBuilder().registerTypeAdapter(LoginResponse.class, new JsonDeserializerLoginResponse())
+                        .serializeNulls().create();
+
+                LoginResponse loginResponse = gson.fromJson(content, new TypeToken<LoginResponse>() {
+                }.getType());
+                System.out.println(loginResponse);
+                if (loginResponse.getSuccess()) {
+
+                    Model model = Model.getInstance();
+                    model.modelname = loginResponse.getModelname();
+                    model.profilePicture = loginResponse.getProfilePicture();
+                    model.onlineHours = loginResponse.getOnlineHours();
+                    model.totalamount = loginResponse.getTotalamount();
+                    model.totalhistory = loginResponse.getTotalhistory();
+                    model.sales = loginResponse.getSales();
+
+                    try {
+                        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("dashboard.fxml"));
+                        Parent rootl = (Parent) fxmlLoader.load();
+
+                        Stage stage = new Stage();
+                        stage.initStyle(StageStyle.UNDECORATED);
+                        stage.setTitle("Model Dashboard");
+
+                        //grab your root here
+                        rootl.setOnMousePressed(new EventHandler<MouseEvent>() {
+                            @Override
+                            public void handle(MouseEvent event) {
+                                xOffset = event.getSceneX();
+                                yOffset = event.getSceneY();
+                            }
+                        });
+
+                        //move around here
+                        rootl.setOnMouseDragged(new EventHandler<MouseEvent>() {
+                            @Override
+                            public void handle(MouseEvent event) {
+                                stage.setX(event.getScreenX() - xOffset);
+                                stage.setY(event.getScreenY() - yOffset);
+                            }
+                        });
+
+                        stage.setScene(new Scene(rootl));
+                        stage.show();
+
+                    } catch (Exception e) {
+                        System.out.println("Error Screen!");
+                    }
+                } else {
+                    //System.exit(0);
+
+                    System.out.println("Login Error!");
+                }
+
+            });
+            new Thread(task).start();
 
         }
 
@@ -155,16 +218,15 @@ public class FXMLDocumentController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
-        
+
         try {
             // TODO
             String url2 = RANDOM_MODELS;
-            
+
             String content = fetchContent2(url2);
-            
+
             System.out.println("initialize ..");
-            
+
             Gson gson = new GsonBuilder().registerTypeAdapter(TestResponse.class, new JsonDeserializerTestResponse())
                     .serializeNulls().create();
 
@@ -172,30 +234,26 @@ public class FXMLDocumentController implements Initializable {
             }.getType());
 
             System.out.println(testResponse);
-            
-             JsonArray dataaaaFromApi = testResponse.getDataFromApi();
-             
-             String[] arr = new String[5];
-             
-             for (int i=0; i < dataaaaFromApi.size(); i++) {
-                
+
+            JsonArray dataaaaFromApi = testResponse.getDataFromApi();
+
+            String[] arr = new String[5];
+
+            for (int i = 0; i < dataaaaFromApi.size(); i++) {
+
                 arr[i] = dataaaaFromApi.get(i).getAsString();
             }
-             
-          
-             
+
             model1.setText(arr[0]);
             model2.setText(arr[1]);
             model3.setText(arr[2]);
             model4.setText(arr[3]);
             model5.setText(arr[4]);
-            
+
         } catch (IOException ex) {
             Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
-            
+
     }
 
     private static String fetchContent(String uri, String modelname) throws IOException {
@@ -234,9 +292,8 @@ public class FXMLDocumentController implements Initializable {
         return content.toString();
 
     }
-    
-    private static String fetchContent2(String uri) throws IOException {
 
+    private static String fetchContent2(String uri) throws IOException {
 
         final int OK = 200;
         URL url = new URL(uri);
