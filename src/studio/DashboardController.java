@@ -5,11 +5,15 @@
  */
 package studio;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import studio.helper.Model;
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
@@ -17,8 +21,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import java.time.LocalDate;
 import java.time.MonthDay;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
@@ -33,6 +40,7 @@ import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
 import studio.helper.Sales;
 import org.controlsfx.control.Notifications;
+import static studio.helper.Global.WEBSOCKET;
 
 
 /**
@@ -59,6 +67,19 @@ public class DashboardController implements Initializable {
     
     @FXML
     private AnchorPane calendar1,calendar2;
+    
+    private WebsocketClientEndpoint clientEndPoint;
+    
+    private String str = "Hello World!";
+    
+//    @FXML
+//    private void handleButtonAction(ActionEvent event) {
+//        System.out.println("You clicked me!");
+//        //label.setText(str);
+//        // send message to websocket
+//        //clientEndPoint.sendMessage("{'appId': 'myId','key': 'myKey','channel':'DemoChannel','event':'App\\Events\\WEbsocketDemoEvent','data':'[{'somedata':'asd'}]'}");
+//        clientEndPoint.sendMessage("{   \"event\": \"pusher:subscribe\",   \"data\": {     \"channel\": \"DemoChannel\"   } }");
+//    }
      
     @FXML
     private void testBtn(MouseEvent event) {
@@ -98,6 +119,10 @@ public class DashboardController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
+        
+          
+         
+         
         
         final Callback<DatePicker, DateCell> dayCellFactory = new Callback<DatePicker, DateCell>() {
             public DateCell call(final DatePicker datePicker) {
@@ -178,6 +203,49 @@ public class DashboardController implements Initializable {
 
         table.setItems(data);
         table.getColumns().addAll(indexFieldCol, firstDayCol, lastSaleCol, lastHourCol);
+        
+        
+    
+        try {
+            // TODO
+
+            clientEndPoint = new WebsocketClientEndpoint(new URI(WEBSOCKET));
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+            // add listener
+//            clientEndPoint.addMessageHandler(new WebsocketClientEndpoint.MessageHandler() {
+//                public void handleMessage(String message) {
+//                    System.out.println(message);
+//
+////                    Gson gson = new Gson();
+////                    JsonElement data = gson.fromJson(message, JsonElement.class);
+//
+////                    if (data.isJsonNull()) {
+////                    } else {
+////                        String jsonString = data.getAsJsonObject().get("data").getAsJsonPrimitive().getAsString();
+////
+////                        if (jsonString.isEmpty()) {
+////                        } else {
+////                            JsonObject parameters = gson.fromJson(jsonString, JsonObject.class);
+////
+////                            String jData = parameters.get("somedata").getAsString();
+////
+////                            if (jData.length() > 0) {
+////                                System.out.println(jData);
+////                                str = jData;
+////                            }
+////                        }
+////
+////                    }
+//
+//                }
+//            });
+
+            // wait 5 seconds for messages from websocket
+            //Thread.sleep(2000);
+        
 
     }
     

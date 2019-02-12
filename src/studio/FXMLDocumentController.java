@@ -111,7 +111,6 @@ public class FXMLDocumentController implements Initializable {
 
         ColorAdjust colorAdjust = new ColorAdjust();
         
-        
         model = user.getText();
 
         if (model.length() > 0) {
