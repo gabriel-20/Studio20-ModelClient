@@ -128,17 +128,17 @@
             </ImageView>
             <AnchorPane layoutX="935.0" layoutY="99.0" prefHeight="63.0" prefWidth="185.0" style="-fx-border-color: #000000;">
                <children>
-                  <Hyperlink layoutX="14.0" layoutY="7.0" text="DOWNLOAD JCAM">
+                  <Hyperlink fx:id="linkJcam" layoutX="14.0" layoutY="7.0" onAction="#link1" text="DOWNLOAD JCAM">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Hyperlink>
-                  <Hyperlink layoutX="14.0" layoutY="26.0" text="DOWNLOAD SPLITTER">
+                  <Hyperlink fx:id="linkSpliter" layoutX="14.0" layoutY="26.0" onAction="#link2" text="DOWNLOAD SPLITTER">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Hyperlink>
-                  <Hyperlink layoutX="14.0" layoutY="46.0" text="DOWNLOAD TEAMVIEWER">
+                  <Hyperlink fx:id="linkTeamviewer" layoutX="14.0" layoutY="46.0" onAction="#link3" text="DOWNLOAD TEAMVIEWER">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
@@ -147,12 +147,12 @@
             </AnchorPane>
             <AnchorPane layoutX="901.0" layoutY="186.0" prefHeight="752.0" prefWidth="230.0" style="-fx-border-color: #000000;">
                <children>
-                  <Label layoutX="18.0" layoutY="14.0" text="November Reservations">
+                  <Label layoutX="18.0" layoutY="14.0" text="This Month Reservations">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Label>
-                  <Label layoutX="22.0" layoutY="389.0" text="December Reservations">
+                  <Label layoutX="22.0" layoutY="389.0" text="Next Month Reservations">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
@@ -213,7 +213,6 @@
                   <Font name="System Bold" size="18.0" />
                </font>
             </Label>
-            <JFXButton layoutX="685.0" layoutY="106.0" onMouseClicked="#testBtn" text="test" />
          </children>
       </AnchorPane>
    </children>

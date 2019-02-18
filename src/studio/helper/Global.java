@@ -16,6 +16,11 @@ public class Global {
     public static final String LOGIN_URL = "https://"+DOMAIN+"/api/testlogin";
     public static final String RANDOM_MODELS = "https://"+DOMAIN+"/api/randommodels";
     public static final String WEBSOCKET = "ws://ws-mtl."+DOMAIN+":6001/app/myKey";
+    public static final String DOWNLOAD_JCAM = "https://box.doclerholding.com/index.php/s/pjIhf3ZDh9uhUIM/authenticate";
+    public static final String DOWNLOAD_SPLITER = "http://very-soft.com/media/products/distributions/wcs_1.6.339_setup_en.exe";
+    public static final String DOWNLOAD_TEAMVIEWER = "https://www.teamviewer.com/en/teamviewer-automatic-download/";
+    public static final String PATH_JASMIN = "C:\\Program Files\\JasminCam\\App\\JCam.exe";
+    public static final String AVATAR = "//planetbotanix.com/wp-content/uploads/2017/08/Female-Avatar-1-300x300.jpg";
     public static final int DEBUG = 1;
     
 }

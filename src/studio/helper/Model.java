@@ -16,12 +16,19 @@ public class Model {
         private static Model single_instance_model = null; 
         
         public String modelname;
+        public String password;
         public String profilePicture;
         public String onlineHours;
         public int  totalamount;
         public int  totalhistory;
         public JsonArray sales;
-
+        public String res_this_month;
+        public int res_this_month_nr;
+        public int res_this_year;
+        public String res_this_period;
+        public String res_this_days;
+        public int res_this_count;
+        public String res_this_hour;
 
         
     private Model() 

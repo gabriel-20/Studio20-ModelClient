@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.reflect.TypeToken;
+import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -57,16 +58,19 @@ public class FXMLDocumentController implements Initializable {
     private double xOffset = 0;
     private double yOffset = 0;
 
-    private String model;
+    private String model, pass;
 
     @FXML
-    private Label label;
+    private Label label, loginStatus;
 
     @FXML
     private JFXTextField model1, model2, model3, model4, model5;
 
     @FXML
     private JFXTextField user;
+    
+    @FXML
+    private JFXPasswordField password;
 
     @FXML
     private Button btn_login;
@@ -88,7 +92,8 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void handleToggle(MouseEvent event) {
         
-             debugwindow.setVisible(false);
+             debugwindow.setVisible(!debugwindow.isVisible());
+               
     }
 
     private String content;
@@ -99,12 +104,15 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     void handleButtonAction(ActionEvent event) throws IOException {
 
+        loginStatus.setText("");
+        
         ColorAdjust colorAdjust = new ColorAdjust();
         
         model = user.getText();
+        pass = password.getText();
 
-        if (model.length() > 0) {
-
+        if ( (model.length() > 0) && (pass.length() > 0) ) {
+            System.out.println("pass "+ pass );
             String url = LOGIN_URL;
             
             Timeline fiveSecondsWonder = new Timeline(new KeyFrame(Duration.seconds(0.05), new EventHandler<ActionEvent>() {
@@ -113,17 +121,14 @@ public class FXMLDocumentController implements Initializable {
                 public void handle(ActionEvent event) {
                     val = val + str;
                     if (!( (val > -0.5) && (val <= -0.1) )){
-                        System.out.println("val="+val);
-                        System.out.println("str="+str);
                         str = str * (-1);
-                        System.out.println("aici");
                     }
                     
                     colorAdjust.setSaturation(val);
                     if ( (val > -0.5) && (val < -0.1) ) {
                         imageLogo.setEffect(colorAdjust);
                     }
-                    System.out.println("this is called every "+ val +" seconds on UI thread");
+                    //System.out.println("this is called every "+ val +" seconds on UI thread");
                     
                 }
             }));
@@ -154,15 +159,30 @@ public class FXMLDocumentController implements Initializable {
 
                     Model model = Model.getInstance();
                     model.modelname = loginResponse.getModelname();
+                    model.password = loginResponse.getPassword();
                     model.profilePicture = loginResponse.getProfilePicture();
                     model.onlineHours = loginResponse.getOnlineHours();
                     model.totalamount = loginResponse.getTotalamount();
                     model.totalhistory = loginResponse.getTotalhistory();
                     model.sales = loginResponse.getSales();
+                    model.res_this_month = loginResponse.getRes_this_month();
+                    model.res_this_month_nr = loginResponse.getRes_this_month_nr();
+                    model.res_this_year = loginResponse.getRes_this_year();
+                    model.res_this_period = loginResponse.getRes_this_period();
+                    model.res_this_days = loginResponse.getRes_this_days();
+                    model.res_this_count = loginResponse.getRes_this_count();
+                    model.res_this_hour = loginResponse.getRes_this_hour();
 
-                    try {
+                    System.out.println(model.password);
+                    System.out.println(pass);
+                    
+                    if (pass.equals(model.password)){
+                        System.out.println("YES!!");  
+                        
+                        try {
                         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("dashboard.fxml"));
                         Parent rootl = (Parent) fxmlLoader.load();
+                        
 
                         Stage stage = new Stage();
                         stage.initStyle(StageStyle.UNDECORATED);
@@ -192,6 +212,13 @@ public class FXMLDocumentController implements Initializable {
                     } catch (Exception e) {
                         System.out.println("Error Screen!");
                     }
+                        
+                    } else {
+                        loginStatus.setText("Invalid email/password..");
+                        System.out.println("NO!!");
+                    }
+                    
+                    
                 } else {
                     //System.exit(0);
 
@@ -208,6 +235,8 @@ public class FXMLDocumentController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
+        debugwindow.setVisible(false);
+                
         try {
             // TODO
             String url2 = RANDOM_MODELS;
