@@ -22,22 +22,22 @@ import java.util.Locale;
  *
  * @author dev
  */
-public class JsonDeserializerTestResponse implements JsonDeserializer<TestResponse>{
+public class JsonDeserializerReservationsResponse implements JsonDeserializer<ReservationsResponse>{
 
-	public TestResponse deserialize(JsonElement json, Type typeOfT, 
+	public ReservationsResponse deserialize(JsonElement json, Type typeOfT, 
 	JsonDeserializationContext context) throws JsonParseException {
 		
 	    JsonObject loginResponseJson = json.getAsJsonObject();
             
             //System.out.println(loginResponseJson);
             
-	    JsonArray  dataFromApi = loginResponseJson.get("data").getAsJsonArray();
+	    String  dataFromApi = loginResponseJson.get("data").getAsString();
             
             String success = loginResponseJson.get("success").getAsString();
         
             //System.out.println(dataFromApi);
             
-	    TestResponse loginresponse = new TestResponse();
+	    ReservationsResponse loginresponse = new ReservationsResponse();
 	    loginresponse.setSuccess(success);
             loginresponse.setDataFromApi(dataFromApi);
             

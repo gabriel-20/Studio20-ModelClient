@@ -159,7 +159,10 @@ public class FXMLDocumentController implements Initializable {
 
                     Model model = Model.getInstance();
                     model.modelname = loginResponse.getModelname();
+                    model.model_id = loginResponse.getModel_id();
                     model.password = loginResponse.getPassword();
+                    model.artistic_email = loginResponse.getArtistic_email();
+                    model.artistic_password = loginResponse.getArtistic_password();
                     model.profilePicture = loginResponse.getProfilePicture();
                     model.onlineHours = loginResponse.getOnlineHours();
                     model.totalamount = loginResponse.getTotalamount();
@@ -169,11 +172,18 @@ public class FXMLDocumentController implements Initializable {
                     model.res_this_month_nr = loginResponse.getRes_this_month_nr();
                     model.res_this_year = loginResponse.getRes_this_year();
                     model.res_this_period = loginResponse.getRes_this_period();
-                    model.res_this_days = loginResponse.getRes_this_days();
+                    model.setReservations(loginResponse.getRes_this_days());
                     model.res_this_count = loginResponse.getRes_this_count();
                     model.res_this_hour = loginResponse.getRes_this_hour();
+                    model.res_next_month = loginResponse.getRes_next_month();
+                    model.res_next_month_nr = loginResponse.getRes_next_month_nr();
+                    model.res_next_year = loginResponse.getRes_next_year();
+                    model.res_next_period = loginResponse.getRes_next_period();
+                    model.res_next_days = loginResponse.getRes_next_days();
+                    model.res_next_count = loginResponse.getRes_next_count();
+                    model.res_next_hour = loginResponse.getRes_next_hour();
 
-                    System.out.println(model.password);
+                    System.out.println(model);
                     System.out.println(pass);
                     
                     if (pass.equals(model.password)){

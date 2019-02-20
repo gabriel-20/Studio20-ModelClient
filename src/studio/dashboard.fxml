@@ -3,6 +3,7 @@
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
@@ -26,7 +27,7 @@
                   <Font name="System Bold" size="14.0" />
                </font>
             </Label>
-            <Label id="onlineHours" fx:id="onlineHours" layoutX="72.0" layoutY="381.0" text="00:00:00">
+            <Label id="onlineHours" fx:id="onlineHours" contentDisplay="CENTER" layoutX="72.0" layoutY="381.0" text="00:00:00" textAlignment="CENTER">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
@@ -147,12 +148,7 @@
             </AnchorPane>
             <AnchorPane layoutX="901.0" layoutY="186.0" prefHeight="752.0" prefWidth="230.0" style="-fx-border-color: #000000;">
                <children>
-                  <Label layoutX="18.0" layoutY="14.0" text="This Month Reservations">
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="22.0" layoutY="389.0" text="Next Month Reservations">
+                  <Label layoutX="18.0" layoutY="14.0" text="View/Set Reservations">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
@@ -162,25 +158,14 @@
                         <Font name="System Bold" size="10.0" />
                      </font>
                   </Label>
-                  <JFXTextField layoutX="18.0" layoutY="309.0" style="-fx-border-color: #000000;" text="06:00 AM" />
-                  <JFXButton layoutX="19.0" layoutY="350.0" prefHeight="25.0" prefWidth="137.0" style="-fx-background-color: #7a6aef;" text="Send Reservations" textFill="WHITE">
+                  <JFXTextField fx:id="timeTextfield" layoutX="18.0" layoutY="309.0" style="-fx-border-color: #000000;" text="06:00 AM" />
+                  <JFXButton layoutX="19.0" layoutY="350.0" onAction="#sendReservations" prefHeight="25.0" prefWidth="137.0" style="-fx-background-color: #7a6aef;" text="Send Reservations" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </JFXButton>
-                  <JFXButton layoutX="18.0" layoutY="713.0" prefHeight="25.0" prefWidth="137.0" style="-fx-background-color: #7a6aef;" text="Send Reservations" textFill="WHITE">
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                  </JFXButton>
-                  <JFXTextField layoutX="19.0" layoutY="675.0" style="-fx-border-color: #000000;" text="06:00 AM" />
-                  <Label layoutX="20.0" layoutY="618.0" prefHeight="50.0" prefWidth="193.0" text="Select the start hour for the reservation hours from the start hour!" textFill="#6b6969" wrapText="true">
-                     <font>
-                        <Font name="System Bold" size="10.0" />
-                     </font>
-                  </Label>
                   <AnchorPane fx:id="calendar1" layoutX="14.0" layoutY="31.0" prefHeight="200.0" prefWidth="200.0" />
-                  <AnchorPane fx:id="calendar2" layoutX="14.0" layoutY="406.0" prefHeight="200.0" prefWidth="200.0" />
+                  <Button layoutX="55.0" layoutY="435.0" mnemonicParsing="false" onAction="#addData" text="Button" />
                </children>
             </AnchorPane>
             <Label layoutX="645.0" layoutY="6.0" text="GO ONLINE" textFill="GREEN">
@@ -198,7 +183,7 @@
                   <Font name="System Bold" size="24.0" />
                </font>
             </Label>
-            <JFXButton layoutX="645.0" layoutY="41.0" onMouseClicked="#execApp" prefHeight="37.0" prefWidth="131.0" style="-fx-background-color: #e72523; -fx-border-color: #000000;" text="LIVEJASMIN" textFill="WHITE">
+            <JFXButton fx:id="btn_jasmin" layoutX="645.0" layoutY="41.0" onAction="#execApp" prefHeight="37.0" prefWidth="131.0" style="-fx-background-color: #e72523; -fx-border-color: #000000;" text="LIVEJASMIN" textFill="WHITE">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
@@ -213,6 +198,11 @@
                   <Font name="System Bold" size="18.0" />
                </font>
             </Label>
+            <JFXButton fx:id="btn_loginmodelcenter" layoutX="645.0" layoutY="90.0" onMouseClicked="#modelCenterLogin" prefHeight="37.0" prefWidth="131.0" style="-fx-background-color: #e72523; -fx-border-color: #000000;" text="MODELCENTER" textFill="WHITE">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </JFXButton>
          </children>
       </AnchorPane>
    </children>
