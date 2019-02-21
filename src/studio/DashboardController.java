@@ -8,8 +8,10 @@ package studio;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
 import studio.helper.Model;
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
@@ -23,18 +25,21 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.time.Instant;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -44,7 +49,6 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Hyperlink;
@@ -68,22 +72,18 @@ import static studio.helper.Global.JASMIN_EXE_NAME;
 import studio.helper.WinRegistry;
 import java.util.List;
 import java.util.Map;
-import javafx.collections.ListChangeListener;
-import javafx.event.Event;
+import java.util.TimeZone;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import studio.helper.Global;
-import static studio.helper.Global.RANDOM_MODELS;
 import static studio.helper.Global.SEND_RESERVATIONS;
+import static studio.helper.Global.WEBSOCKET;
 import studio.helper.debug.JsonDeserializerReservationsResponse;
-import studio.helper.debug.JsonDeserializerTestResponse;
 import studio.helper.debug.ReservationsResponse;
-import studio.helper.debug.TestResponse;
 
 /**
  * FXML Controller class
@@ -99,8 +99,11 @@ public class DashboardController implements Initializable {
     final String JASMIN_PATH = "PATH_JASMIN";
 
     @FXML
-    private JFXTextField timeTextfield;
-            
+    private JFXTextField timeTextfield, inputChat;
+
+    @FXML
+    private JFXTextArea chatArea;
+
     @FXML
     private Label modelName;
 
@@ -113,11 +116,19 @@ public class DashboardController implements Initializable {
     @FXML
     private Label totalhistory;
 
+    private String jText = "";
+
+    private String messageType = "message";
+
     @FXML
     private Hyperlink linkTeamviewer, linkSpliter, linkJcam;
 
     @FXML
     private ImageView profilePicture;
+    
+     int max = 0;
+
+    
 
     @FXML
     private AnchorPane calendar1;
@@ -131,21 +142,24 @@ public class DashboardController implements Initializable {
     private static final int KEY_SET_VALUE = 2;
     private static final int KEY_READ = 0x20019;
 
-    @FXML
-    private void testBtn(MouseEvent event) {
+    ObservableList<LocalDate> selectedDates = FXCollections.observableArrayList();
 
-        Notifications.create()
-                .title("Studio20")
-                .text("Hello ..")
-                .showWarning();
-    }
-    
     @FXML
-    private void addData(ActionEvent event){
-    
+    private void addData(ActionEvent event) {
+
         System.out.println("sssssssssss");
-    model.res_this_days.add("22");
-    System.out.println(model.res_this_days);
+        model.res_this_days.add("22");
+        System.out.println(model.res_this_days);
+    }
+
+    @FXML
+    private void sendMessasge(MouseEvent event) {
+
+        String text = "";
+        text = inputChat.getText();
+        //{"type":"message", "message":"asasaaaaasdsadadsboss!"}
+        clientEndPoint.sendMessage("{\"type\":\"message\",\"message\":\""+text+"\"}");
+
     }
 
     @FXML
@@ -192,12 +206,21 @@ public class DashboardController implements Initializable {
         }
 
     }
-    
+
     @FXML
-    private void sendReservations(ActionEvent event){
-    
+    private void showNot(ActionEvent event) {
+        Notifications.create()
+                .title("Studio20")
+                .text("asdasdas")
+                .showWarning();
+
+    }
+
+    @FXML
+    private void sendReservations(ActionEvent event) {
+
         System.out.println("Send Reservations");
-        
+
         try {
             // TODO
             String url = SEND_RESERVATIONS;
@@ -215,17 +238,8 @@ public class DashboardController implements Initializable {
             System.out.println(reservationsResponse);
 
             String dataFromApi = reservationsResponse.getDataFromApi();
-            
+
             System.out.println(dataFromApi);
-
-//            String[] arr = new String[5];
-//
-//            for (int i = 0; i < dataaaaFromApi.size(); i++) {
-//
-//                arr[i] = dataaaaFromApi.get(i).getAsString();
-//            }
-
-            
 
         } catch (IOException ex) {
             Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
@@ -264,9 +278,6 @@ public class DashboardController implements Initializable {
                 emailBox.sendKeys("modelname");
                 passBox.sendKeys("modelname");
 
-                //emailBox.submit();
-                //Thread.sleep(5000);
-                //driver.quit();
                 return null;
             }
         };
@@ -363,6 +374,9 @@ public class DashboardController implements Initializable {
     @FXML
     private TableView<Sales> table;
 
+    @FXML
+    private Button btnSendReservations;
+
     private final ObservableList<Sales> data = FXCollections.observableArrayList();
 
     /**
@@ -371,17 +385,20 @@ public class DashboardController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         
+        String lday = "01-" + model.res_this_month_nr + "-" + model.res_this_year;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-MM-yyyy");
+        LocalDate locDate = LocalDate.parse(lday, formatter);
+        Boolean asd = false;
+        YearMonth yearMonthObject = YearMonth.of(model.res_this_year, Integer.valueOf(model.res_this_month_nr));
+        int daysInMonth = yearMonthObject.lengthOfMonth();
+ 
+        
+        String ldaynext = "31-" + model.res_next_month_nr + "-" + model.res_next_year;
+        LocalDate locDateNext = LocalDate.parse(ldaynext, formatter);
+
+        btnSendReservations.setDisable(true);
+
         timeTextfield.setText(model.res_this_hour);
-
-        ObservableList<LocalDate> selectedDates = FXCollections.observableArrayList();
-        ListView<LocalDate> dateList = new ListView<>(selectedDates);
-
-        //final ObservableList<String>days = model.res_this_days;
-//        int[] daysi = new int[days.size()];
-//        for (int i = 0; i < days.size(); i++) {
-//            
-//            daysi[i] = Integer.parseInt(days[i]);
-//        }
 
         final String[] daysnext = model.res_next_days.split("\\,");
         int[] daysinext = new int[daysnext.length];
@@ -399,22 +416,34 @@ public class DashboardController implements Initializable {
                     @Override
                     public void updateItem(LocalDate item, boolean empty) {
                         super.updateItem(item, empty);
-
-                        boolean alreadySelected = selectedDates.contains(item);
-
-                        //YearMonth yearMonthObject = YearMonth.of(model.res_next_year, model.res_next_month_nr);
-                        //int daysInMonth = yearMonthObject.lengthOfMonth();
-
+                        
                         int year = item.getYear();
                         int month = item.getMonthValue();
-                        String dayz = (item.getDayOfMonth() < 10) ? "0" + Integer.toString(item.getDayOfMonth()) : Integer.toString(item.getDayOfMonth());
                         int day = item.getDayOfMonth();
+
+                        //System.out.println(locDate);
+                        //System.out.println(item);
+                        //System.out.println(locDateNext);
+                        if ( (item.isAfter(locDateNext)) || (item.isBefore(locDate)) ){ 
+                        setDisable(true);
+                        setStyle("-fx-background-color: #ffc0cb;visibility:hidden");
+                        } else {
+                        System.out.println(day);
+                        System.out.println(max);
+                        System.out.println(item.lengthOfMonth());
+                        if (day == 1) max = item.lengthOfMonth();
+                        
+                        if (day == max ) max = 0;
+                        
+                        if ((day >= 1) && (day <= max)) {
+                        
+                        System.out.println("is here");
+                        
+                        boolean alreadySelected = selectedDates.contains(item);
+                        String dayz = (item.getDayOfMonth() < 10) ? "0" + Integer.toString(item.getDayOfMonth()) : Integer.toString(item.getDayOfMonth());
                         boolean contains = model.res_this_days.contains(dayz);
                         boolean contains2 = IntStream.of(daysinext).anyMatch(x -> x == day);
 
-                        //System.out.println("year -> " + year + "| month -> " + month + "| day -> " + dayz + "| contains -> " + contains);
-                        //System.out.println("YEAR -> " + model.res_this_year + "| MONTH -> " + model.res_this_month_nr + "| DAYS -> " + model.res_this_days + "| contains -> " + contains);
-                        //System.out.println("NEXTYEAR -> " + model.res_next_year + "| NEXTMONTH -> " + model.res_next_month_nr + "| NEXTDAYS -> " + model.res_next_days.toString() + "| contains -> " + contains2);
                         if (((year == model.res_this_year) && (month == Integer.parseInt(model.res_this_month_nr)) && (contains))
                                 || ((year == model.res_next_year) && (month == Integer.parseInt(model.res_next_month_nr)) && (contains2))) {
                             setTooltip(new Tooltip("Reservations!"));
@@ -425,10 +454,19 @@ public class DashboardController implements Initializable {
                             setDisable(true);
                         }
 
-//                            setDisable(alreadySelected);
                         if (alreadySelected) {
                             setStyle("-fx-background-color: #09a30f;");
                         }
+                        
+                        }
+                        
+                        
+                        
+                        
+                        
+                       
+                        }
+                        
                     }
                 };
             }
@@ -451,29 +489,35 @@ public class DashboardController implements Initializable {
 
         String imageUrl = model.profilePicture;
 
-        System.out.println(imageUrl);
-
         Image image = new Image(imageUrl);
         profilePicture.setImage(image);
 
         StackPane root1 = new StackPane();
 
-        DatePicker picker = new DatePicker(LocalDate.now());
+       
+        
+        DatePicker picker = new DatePicker(locDate);
         picker.setDayCellFactory(dayCellFactory);
 
         picker.setOnAction((event) -> {
+            
+            //LocalDate localDatezz = picker.getValue();
+
+            
             System.out.println("Selected date: " + picker.getValue());
-            
-            if (!selectedDates.contains(picker.getValue())) selectedDates.add(picker.getValue());
-            else selectedDates.remove(picker.getValue());
-            
+
+            if (!selectedDates.contains(picker.getValue())) {
+                selectedDates.add(picker.getValue());
+            } else {
+                selectedDates.remove(picker.getValue());
+            }
+
             System.out.println("Selected dates: " + selectedDates);
         });
-        
+
         final DatePickerSkin skin1 = new DatePickerSkin(picker);
         root1.getChildren().add(skin1.getPopupContent());
         calendar1.getChildren().add(root1);
-                
 
         TableColumn indexFieldCol = new TableColumn("#");
         indexFieldCol.setMinWidth(100);
@@ -493,59 +537,95 @@ public class DashboardController implements Initializable {
 
         table.setItems(data);
         table.getColumns().addAll(indexFieldCol, firstDayCol, lastSaleCol, lastHourCol);
-        
-        
 
-//        try {
 //            if (pathJasmin == null) {
 //                getJasminPath();
 //            }
-//
-////        try {
-////            // TODO
-////
-////            clientEndPoint = new WebsocketClientEndpoint(new URI(WEBSOCKET));
-////        } catch (URISyntaxException ex) {
-////            Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
-////        }
-////
-////            // add listener
-////            clientEndPoint.addMessageHandler(new WebsocketClientEndpoint.MessageHandler() {
-////                public void handleMessage(String message) {
-////                    System.out.println(message);
-////
-////                    Gson gson = new Gson();
-////                    JsonElement data = gson.fromJson(message, JsonElement.class);
-////
-////                    if (data.isJsonNull()) {
-////                    } else {
-////                        String jsonString = data.getAsJsonObject().get("data").getAsJsonPrimitive().getAsString();
-////
-////                        if (jsonString.isEmpty()) {
-////                        } else {
-////                            JsonObject parameters = gson.fromJson(jsonString, JsonObject.class);
-////
-////                            String jData = parameters.get("somedata").getAsString();
-////
-////                            if (jData.length() > 0) {
-////                                System.out.println(jData);
-////                                str = jData;
-////                            }
-////                        }
-////
-////                    }
-////
-////                }
-////            });
-//            // wait 5 seconds for messages from websocket
-//            //Thread.sleep(2000);
-//        } catch (IllegalArgumentException ex) {
-//            Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (IllegalAccessException ex) {
-//            Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (InvocationTargetException ex) {
-//            Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+        try {
+            // TODO
+
+            clientEndPoint = new WebsocketClientEndpoint(new URI(WEBSOCKET));
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        //send modelname for socket auth
+        clientEndPoint.sendMessage(model.modelname);
+
+        // add listener
+        clientEndPoint.addMessageHandler(new WebsocketClientEndpoint.MessageHandler() {
+            public void handleMessage(String message) {
+                System.out.println(message);
+
+                Task<Void> task = new Task<Void>() {
+                    @Override
+                    public Void call() throws Exception {
+
+                        Thread.sleep(100);
+
+                        Gson gson = new Gson();
+                        JsonElement data = gson.fromJson(message, JsonElement.class);
+
+                        if (!data.isJsonNull()) {
+
+                            String jsonType = data.getAsJsonObject().get("type").getAsJsonPrimitive().getAsString();
+
+                            if (!jsonType.isEmpty()) {
+
+                                if (jsonType.equals("message")) {
+
+                                    JsonObject jsonData = data.getAsJsonObject().get("data").getAsJsonObject();
+                                    JsonObject parameters = gson.fromJson(jsonData, JsonObject.class);
+
+                                    String jText = parameters.get("text").getAsString();
+                                    String jAuthor = parameters.get("author").getAsString();
+                                    String jcolor = parameters.get("color").getAsString();
+                                    int jtime = parameters.get("time").getAsInt();
+                                    TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+
+                                    Date time = Date.from( Instant.ofEpochSecond( jtime ) );
+
+                                    messageType = "message";
+                                    chatArea.appendText("\n" + time + "\n" + jAuthor + " : " + jText);
+                                    System.out.println(jText);
+
+                                }
+
+                                if (jsonType.equals("notification")) {
+
+                                    JsonObject jsonData = data.getAsJsonObject().get("data").getAsJsonObject();
+                                    JsonObject parameters = gson.fromJson(jsonData, JsonObject.class);
+
+                                    messageType = "notification";
+                                    jText = parameters.get("text").getAsString();
+
+                                }
+
+                                if (jsonType.equals("history")) {
+
+                                }
+
+                            } else {
+                                //error
+                            }
+
+                        }
+
+                        return null;
+                    }
+                };
+                task.setOnSucceeded(ee -> {
+                    if (messageType == "notification") {
+                        showNotification(jText);
+                    }
+
+                });
+                new Thread(task).start();
+
+            }
+        });
+            //Thread.sleep(2000);
+
         //prefs.remove(JASMIN_PATH);
     }
 
@@ -582,36 +662,50 @@ public class DashboardController implements Initializable {
 
     private String sendReservations(String uri) throws MalformedURLException, ProtocolException, IOException {
 
-        final int OK = 200;
         URL url = new URL(uri);
-        
-        String listString = "";
 
-        for (String s : model.res_this_days)
-        {
-            listString += s + ",";
+        ArrayList<String> arr = new ArrayList<>();
+
+        for (LocalDate j : selectedDates) {
+            int day = j.getDayOfMonth();
+            int month = j.getMonthValue();
+            String dayy = "";
+
+            if (Integer.valueOf(model.res_this_month_nr) == month) {
+                if (day < 10) {
+                    dayy = "0" + String.valueOf(day);
+                } else {
+                    dayy = String.valueOf(day);
+                }
+                arr.add(dayy);
+            }
         }
-        
-        listString = listString.substring(0, listString.lastIndexOf(","));
-        
-        
-        Map<String,Object> params = new LinkedHashMap<>();
+
+        String listArrString = "";
+
+        listArrString = arr.stream().map((s) -> s + ",").reduce(listArrString, String::concat);
+
+        listArrString = listArrString.substring(0, listArrString.lastIndexOf(","));
+
+        Map<String, Object> params = new LinkedHashMap<>();
         params.put("model_id", model.model_id);
         params.put("period", model.res_this_month_nr + "-" + model.res_this_year);
-        params.put("days", listString);
-        params.put("hour", "10:20 PM");
+        params.put("days", listArrString);
+        params.put("hour", model.res_this_hour);
 
         StringBuilder postData = new StringBuilder();
-        for (Map.Entry<String,Object> param : params.entrySet()) {
-            if (postData.length() != 0) postData.append('&');
+        for (Map.Entry<String, Object> param : params.entrySet()) {
+            if (postData.length() != 0) {
+                postData.append('&');
+            }
             postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
             postData.append('=');
             postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
         }
         byte[] postDataBytes = postData.toString().getBytes("UTF-8");
-        
+
         System.out.println(postData.toString());
-        
+
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
         connection.setDoOutput(true);
@@ -637,6 +731,15 @@ public class DashboardController implements Initializable {
         }
 
         return content.toString();
+
+    }
+
+    private void showNotification(String message) {
+
+        Notifications.create()
+                .title("Studio20")
+                .text(message)
+                .showWarning();
 
     }
 

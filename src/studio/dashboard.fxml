@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextArea?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -87,7 +88,7 @@
             </AnchorPane>
          </children>
       </AnchorPane>
-      <AnchorPane layoutX="224.0" layoutY="14.0" prefHeight="985.0" prefWidth="1176.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <AnchorPane layoutX="224.0" layoutY="-14.0" prefHeight="985.0" prefWidth="1176.0" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-14.0">
          <children>
             <JFXButton layoutX="31.0" layoutY="161.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #000000;" text="DASHBOARD">
                <font>
@@ -110,13 +111,15 @@
                      <children>
                         <Pane layoutY="175.0" prefHeight="35.0" prefWidth="821.0" style="-fx-border-color: #000000;">
                            <children>
-                              <JFXButton layoutX="743.0" layoutY="3.0" prefHeight="25.0" prefWidth="64.0" style="-fx-background-color: #59c2e6;" text="CHAT" textFill="WHITE">
+                              <JFXButton layoutX="743.0" layoutY="3.0" onMouseClicked="#sendMessasge" prefHeight="25.0" prefWidth="64.0" style="-fx-background-color: #59c2e6;" text="CHAT" textFill="WHITE">
                                  <font>
                                     <Font name="System Bold" size="14.0" />
                                  </font>
                               </JFXButton>
+                              <JFXTextField fx:id="inputChat" layoutX="14.0" layoutY="2.0" prefHeight="25.0" prefWidth="712.0" />
                            </children>
                         </Pane>
+                        <JFXTextArea fx:id="chatArea" layoutX="14.0" prefHeight="175.0" prefWidth="793.0" />
                      </children>
                   </Pane>
                   <TableView fx:id="table" layoutX="28.0" layoutY="52.0" prefHeight="373.0" prefWidth="793.0" />
@@ -159,13 +162,13 @@
                      </font>
                   </Label>
                   <JFXTextField fx:id="timeTextfield" layoutX="18.0" layoutY="309.0" style="-fx-border-color: #000000;" text="06:00 AM" />
-                  <JFXButton layoutX="19.0" layoutY="350.0" onAction="#sendReservations" prefHeight="25.0" prefWidth="137.0" style="-fx-background-color: #7a6aef;" text="Send Reservations" textFill="WHITE">
+                  <JFXButton fx:id="btnSendReservations" layoutX="19.0" layoutY="350.0" onAction="#sendReservations" prefHeight="25.0" prefWidth="137.0" style="-fx-background-color: #7a6aef;" text="Send Reservations" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </JFXButton>
                   <AnchorPane fx:id="calendar1" layoutX="14.0" layoutY="31.0" prefHeight="200.0" prefWidth="200.0" />
-                  <Button layoutX="55.0" layoutY="435.0" mnemonicParsing="false" onAction="#addData" text="Button" />
+                  <Button layoutX="55.0" layoutY="435.0" mnemonicParsing="false" onAction="#showNot" text="Button" />
                </children>
             </AnchorPane>
             <Label layoutX="645.0" layoutY="6.0" text="GO ONLINE" textFill="GREEN">

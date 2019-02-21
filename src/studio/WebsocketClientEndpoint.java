@@ -60,6 +60,7 @@ public class WebsocketClientEndpoint {
     @OnClose
     public void onClose(Session userSession, CloseReason reason) {
         System.out.println("closing websocket");
+        
         this.userSession = null;
     }
 
