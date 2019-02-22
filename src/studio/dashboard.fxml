@@ -4,7 +4,6 @@
 <?import com.jfoenix.controls.JFXTextArea?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
@@ -73,22 +72,18 @@
                   <Font name="System Bold" size="36.0" />
                </font>
             </Label>
-            <ImageView fitHeight="119.0" fitWidth="217.0" layoutX="4.0" layoutY="774.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@images/graph.png" />
-               </image>
-            </ImageView>
             <AnchorPane depthTest="ENABLE" layoutX="5.0" layoutY="46.0" prefHeight="117.0" prefWidth="200.0" style="-fx-border-color: RED;">
                <children>
-                  <ImageView id="profilePicture" fx:id="profilePicture" fitHeight="113.0" fitWidth="208.0" layoutX="2.0" layoutY="2.0" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="profilePicture" fitHeight="113.0" fitWidth="208.0" layoutX="2.0" layoutY="2.0" pickOnBounds="true" preserveRatio="true" />
                </children>
                <opaqueInsets>
                   <Insets bottom="22.0" right="3.0" />
                </opaqueInsets>
             </AnchorPane>
+            <AnchorPane fx:id="charts" layoutX="-9.0" layoutY="760.0" prefHeight="188.0" prefWidth="230.0" />
          </children>
       </AnchorPane>
-      <AnchorPane layoutX="224.0" layoutY="-14.0" prefHeight="985.0" prefWidth="1176.0" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-14.0">
+      <AnchorPane layoutX="224.0" prefHeight="1000.0" prefWidth="1158.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <JFXButton layoutX="31.0" layoutY="161.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #000000;" text="DASHBOARD">
                <font>
@@ -168,14 +163,8 @@
                      </font>
                   </JFXButton>
                   <AnchorPane fx:id="calendar1" layoutX="14.0" layoutY="31.0" prefHeight="200.0" prefWidth="200.0" />
-                  <Button layoutX="55.0" layoutY="435.0" mnemonicParsing="false" onAction="#showNot" text="Button" />
                </children>
             </AnchorPane>
-            <Label layoutX="645.0" layoutY="6.0" text="GO ONLINE" textFill="GREEN">
-               <font>
-                  <Font name="System Bold" size="24.0" />
-               </font>
-            </Label>
             <Label id="modelName" fx:id="modelName" layoutX="30.0" layoutY="79.0" text="MODEL NAME" underline="true">
                <font>
                   <Font name="System Bold" size="28.0" />
@@ -186,7 +175,7 @@
                   <Font name="System Bold" size="24.0" />
                </font>
             </Label>
-            <JFXButton fx:id="btn_jasmin" layoutX="645.0" layoutY="41.0" onAction="#execApp" prefHeight="37.0" prefWidth="131.0" style="-fx-background-color: #e72523; -fx-border-color: #000000;" text="LIVEJASMIN" textFill="WHITE">
+            <JFXButton fx:id="btn_jasmin" layoutX="645.0" layoutY="41.0" onAction="#execApp" prefHeight="37.0" prefWidth="131.0" style="-fx-background-color: #47d147; -fx-border-color: #000000;" text="GO ONLINE" textFill="WHITE">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
@@ -201,7 +190,7 @@
                   <Font name="System Bold" size="18.0" />
                </font>
             </Label>
-            <JFXButton fx:id="btn_loginmodelcenter" layoutX="645.0" layoutY="90.0" onMouseClicked="#modelCenterLogin" prefHeight="37.0" prefWidth="131.0" style="-fx-background-color: #e72523; -fx-border-color: #000000;" text="MODELCENTER" textFill="WHITE">
+            <JFXButton fx:id="btn_loginmodelcenter" layoutX="645.0" layoutY="90.0" onMouseClicked="#modelCenterLogin" prefHeight="37.0" prefWidth="131.0" style="-fx-background-color: #4d4dff; -fx-border-color: #000000;" text="View Profile" textFill="WHITE">
                <font>
                   <Font size="14.0" />
                </font>

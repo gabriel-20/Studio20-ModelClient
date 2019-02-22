@@ -40,9 +40,15 @@ public class JsonDeserializerLoginResponse implements JsonDeserializer<LoginResp
             String modelname = dataFromApi.get("sync_Modelname").getAsString();
             String password = dataFromApi.get("password").getAsString();
             int model_id = dataFromApi.get("model_id").getAsInt();
+            
+            String artistic_email = "email";
+            String artistic_password = "password";
           
-            String artistic_email = dataFromApi.get("artistic_email").getAsString();
-            String artistic_password = dataFromApi.get("artistic_password").getAsString();
+            //String artistic_email = dataFromApi.get("artistic_email").getAsString();
+            //String artistic_password = dataFromApi.get("artistic_password").getAsString();
+            
+//            String artistic_email = (dataFromApi.get("artistic_email").isJsonNull()) ? "" : dataFromApi.get("artistic_email").getAsString();
+//            String artistic_password = (dataFromApi.get("artistic_password").isJsonNull()) ? "" : dataFromApi.get("artistic_password").getAsString();           
             
             JsonObject reservations = loginResponseJson.get("reservations").getAsJsonObject();
             

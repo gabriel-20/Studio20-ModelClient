@@ -56,13 +56,13 @@ public class Model {
 
             public void onChanged(ListChangeListener.Change change) {
                 
-            System.out.println("Detected a change! ");
+            //System.out.println("Detected a change! ");
 
             while (change.next()) {
 
-            System.out.println("Was added? " + change.wasAdded());
+            //System.out.println("Was added? " + change.wasAdded());
 
-            System.out.println("Was removed? " + change.wasRemoved());
+            //System.out.println("Was removed? " + change.wasRemoved());
 
             }
 

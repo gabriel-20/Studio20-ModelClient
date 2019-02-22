@@ -17,7 +17,7 @@
             <Image url="@images/logo2.png" />
          </image>
       </ImageView>
-      <JFXTextField id="user" fx:id="user" alignment="CENTER" depthTest="ENABLE" focusColor="RED" layoutX="248.0" layoutY="226.0" prefHeight="25.0" prefWidth="205.0" promptText="E-mail" style="-fx-border-color: #000000;" text="gabriel.basca@studio20.com" unFocusColor="#ebe8e8">
+      <JFXTextField id="user" fx:id="user" alignment="CENTER" depthTest="ENABLE" focusColor="RED" layoutX="248.0" layoutY="226.0" prefHeight="25.0" prefWidth="205.0" promptText="E-mail" style="-fx-border-color: #000000;" text="anayaamiss@gmail.com" unFocusColor="#ebe8e8">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -25,7 +25,7 @@
             <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
          </opaqueInsets>
       </JFXTextField>
-      <JFXPasswordField fx:id="password" alignment="CENTER" focusColor="RED" layoutX="248.0" layoutY="275.0" prefHeight="25.0" prefWidth="205.0" promptText="PASSWORD" style="-fx-border-color: #000000;" text="Studio20!" unFocusColor="#ebe8e8">
+      <JFXPasswordField fx:id="password" alignment="CENTER" focusColor="RED" layoutX="248.0" layoutY="275.0" prefHeight="25.0" prefWidth="205.0" promptText="PASSWORD" style="-fx-border-color: #000000;" text="mamamia69" unFocusColor="#ebe8e8">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>

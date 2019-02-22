@@ -5,10 +5,14 @@
  */
 package studio;
 
+import java.io.IOException;
 import java.net.URI;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
 import javax.websocket.ContainerProvider;
+import javax.websocket.DeploymentException;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
@@ -30,15 +34,27 @@ public class WebsocketClientEndpoint {
 
     Session userSession = null;
     private MessageHandler messageHandler;
+    private MessageHandler2 messageHandler2;
+    
 
-    public WebsocketClientEndpoint(URI endpointURI) {
-        try {
+    public WebsocketClientEndpoint(URI endpointURI)  {
+        
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+        try {
             container.connectToServer(this, endpointURI);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+//            if (!container.connectToServer(this, endpointURI).isOpen()) {
+//                System.out.println("nuuuuuuuuuuuuuuu");
+//            } else {
+//                System.out.println("aaaaaaaaa");
+//            }
+        } catch (DeploymentException | IOException ex) {
+            Logger.getLogger(WebsocketClientEndpoint.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("nuuuuuuuuuuuuuuu");
         }
+        
     }
+
+
 
     /**
      * Callback hook for Connection open events.
@@ -62,7 +78,9 @@ public class WebsocketClientEndpoint {
         System.out.println("closing websocket");
         
         this.userSession = null;
+        this.messageHandler2.handleMessage2("asd");
     }
+    
 
     /**
      * Callback hook for Message Events. This method will be invoked when a client send a message.
@@ -84,6 +102,10 @@ public class WebsocketClientEndpoint {
     public void addMessageHandler(MessageHandler msgHandler) {
         this.messageHandler = msgHandler;
     }
+    
+    public void addMessageHandlerTest(MessageHandler2 msgHandler) {
+        this.messageHandler2 = msgHandler;
+    }
 
     /**
      * Send a message.
@@ -103,4 +125,14 @@ public class WebsocketClientEndpoint {
 
         public void handleMessage(String message);
     }
+    
+    public static interface MessageHandler2 {
+
+        public void handleMessage2(String message);
+    }
+    
+
+    
+    
+    
 }
