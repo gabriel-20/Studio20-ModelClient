@@ -16,6 +16,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.reflect.TypeToken;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
+import io.sentry.Sentry;
+import io.sentry.SentryClient;
+import io.sentry.SentryClientFactory;
+import io.sentry.event.BreadcrumbBuilder;
+import io.sentry.event.UserBuilder;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -55,6 +60,8 @@ import studio.helper.debug.TestResponse;
  */
 public class FXMLDocumentController implements Initializable {
 
+    private static SentryClient sentry;
+
     private double xOffset = 0;
     private double yOffset = 0;
 
@@ -68,19 +75,19 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private JFXTextField user;
-    
+
     @FXML
     private JFXPasswordField password;
 
     @FXML
     private Button btn_login;
-    
+
     @FXML
     private ImageView imageLogo;
-    
+
     @FXML
     private AnchorPane debugwindow;
-    
+
     @FXML
     private Button togBtn;
 
@@ -88,16 +95,16 @@ public class FXMLDocumentController implements Initializable {
     private void handleClose(MouseEvent event) {
         System.exit(0);
     }
-    
+
     @FXML
     private void handleToggle(MouseEvent event) {
-        
-             debugwindow.setVisible(!debugwindow.isVisible());
-               
+
+        debugwindow.setVisible(!debugwindow.isVisible());
+
     }
 
     private String content;
-    
+
     private Double str = -0.1;
     private Double val = 0.0;
 
@@ -105,31 +112,31 @@ public class FXMLDocumentController implements Initializable {
     void handleButtonAction(ActionEvent event) throws IOException {
 
         loginStatus.setText("");
-        
+
         ColorAdjust colorAdjust = new ColorAdjust();
-        
+
         model = user.getText();
         pass = password.getText();
 
-        if ( (model.length() > 0) && (pass.length() > 0) ) {
-            System.out.println("pass "+ pass );
+        if ((model.length() > 0) && (pass.length() > 0)) {
+            System.out.println("pass " + pass);
             String url = LOGIN_URL;
-            
+
             Timeline fiveSecondsWonder = new Timeline(new KeyFrame(Duration.seconds(0.05), new EventHandler<ActionEvent>() {
 
                 @Override
                 public void handle(ActionEvent event) {
                     val = val + str;
-                    if (!( (val > -0.5) && (val <= -0.1) )){
+                    if (!((val > -0.5) && (val <= -0.1))) {
                         str = str * (-1);
                     }
-                    
+
                     colorAdjust.setSaturation(val);
-                    if ( (val > -0.5) && (val < -0.1) ) {
+                    if ((val > -0.5) && (val < -0.1)) {
                         imageLogo.setEffect(colorAdjust);
                     }
                     //System.out.println("this is called every "+ val +" seconds on UI thread");
-                    
+
                 }
             }));
             fiveSecondsWonder.setCycleCount(Timeline.INDEFINITE);
@@ -138,8 +145,6 @@ public class FXMLDocumentController implements Initializable {
             Task<Void> task = new Task<Void>() {
                 @Override
                 public Void call() throws Exception {
-                    
-                    
 
                     content = fetchContent(url, model);
                     System.out.println(content);
@@ -185,50 +190,48 @@ public class FXMLDocumentController implements Initializable {
 
                     System.out.println(model);
                     System.out.println(pass);
-                    
-                    if (pass.equals(model.password)){
-                        System.out.println("YES!!");  
-                        
+
+                    if (pass.equals(model.password)) {
+                        System.out.println("YES!!");
+
                         try {
-                        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("dashboard.fxml"));
-                        Parent rootl = (Parent) fxmlLoader.load();
-                        
+                            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("dashboard.fxml"));
+                            Parent rootl = (Parent) fxmlLoader.load();
 
-                        Stage stage = new Stage();
-                        stage.initStyle(StageStyle.UNDECORATED);
-                        stage.setTitle("Model Dashboard");
+                            Stage stage = new Stage();
+                            stage.initStyle(StageStyle.UNDECORATED);
+                            stage.setTitle("Model Dashboard");
 
-                        //grab your root here
-                        rootl.setOnMousePressed(new EventHandler<MouseEvent>() {
-                            @Override
-                            public void handle(MouseEvent event) {
-                                xOffset = event.getSceneX();
-                                yOffset = event.getSceneY();
-                            }
-                        });
+                            //grab your root here
+                            rootl.setOnMousePressed(new EventHandler<MouseEvent>() {
+                                @Override
+                                public void handle(MouseEvent event) {
+                                    xOffset = event.getSceneX();
+                                    yOffset = event.getSceneY();
+                                }
+                            });
 
-                        //move around here
-                        rootl.setOnMouseDragged(new EventHandler<MouseEvent>() {
-                            @Override
-                            public void handle(MouseEvent event) {
-                                stage.setX(event.getScreenX() - xOffset);
-                                stage.setY(event.getScreenY() - yOffset);
-                            }
-                        });
+                            //move around here
+                            rootl.setOnMouseDragged(new EventHandler<MouseEvent>() {
+                                @Override
+                                public void handle(MouseEvent event) {
+                                    stage.setX(event.getScreenX() - xOffset);
+                                    stage.setY(event.getScreenY() - yOffset);
+                                }
+                            });
 
-                        stage.setScene(new Scene(rootl));
-                        stage.show();
+                            stage.setScene(new Scene(rootl));
+                            stage.show();
 
-                    } catch (Exception e) {
-                        System.out.println("Error Screen!");
-                    }
-                        
+                        } catch (Exception e) {
+                            System.out.println("Error Screen!");
+                        }
+
                     } else {
                         loginStatus.setText("Invalid email/password..");
                         System.out.println("NO!!");
                     }
-                    
-                    
+
                 } else {
                     //System.exit(0);
 
@@ -242,11 +245,59 @@ public class FXMLDocumentController implements Initializable {
 
     }
 
+    void logWithStaticAPI() {
+        // Note that all fields set on the context are optional. Context data is copied onto
+        // all future events in the current context (until the context is cleared).
+
+        // Record a breadcrumb in the current context. By default the last 100 breadcrumbs are kept.
+        Sentry.getContext().recordBreadcrumb(
+                new BreadcrumbBuilder().setMessage("User made an action").build()
+        );
+
+        // Set the user in the current context.
+        Sentry.getContext().setUser(
+                new UserBuilder().setEmail("hello@sentry.io").build()
+        );
+
+        // Add extra data to future events in this context.
+        Sentry.getContext().addExtra("extra", "thing");
+
+        // Add an additional tag to future events in this context.
+        Sentry.getContext().addTag("tagName", "tagValue");
+
+        /*
+         This sends a simple event to Sentry using the statically stored instance
+         that was created in the ``main`` method.
+         */
+        Sentry.capture("This is a test");
+
+        try {
+            unsafeMethod();
+        } catch (Exception e) {
+            // This sends an exception event to Sentry using the statically stored instance
+            // that was created in the ``main`` method.
+            Sentry.capture(e);
+        }
+    }
+
+    void unsafeMethod() {
+        throw new UnsupportedOperationException("You shouldn't call this!");
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
+        System.out.println("heree");
+
+        Sentry.init("https://e739e480317f45c4ac179558e84dbc6b@sentry.io/1401926");
+
+        sentry = SentryClientFactory.sentryClient();
+
+        FXMLDocumentController myClass = new FXMLDocumentController();
+        myClass.logWithStaticAPI();
+
         debugwindow.setVisible(false);
-                
+
         try {
             // TODO
             String url2 = RANDOM_MODELS;

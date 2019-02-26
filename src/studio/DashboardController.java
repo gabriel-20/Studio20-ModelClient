@@ -15,6 +15,9 @@ import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
 import studio.helper.Model;
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.io.BufferedReader;
@@ -30,6 +33,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
@@ -80,14 +85,23 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.websocket.DeploymentException;
+import okhttp3.OkHttpClient;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import studio.helper.Global;
 import static studio.helper.Global.SEND_RESERVATIONS;
-import static studio.helper.Global.WEBSOCKET;
+import static studio.helper.Global.SOCKETIO;
 import studio.helper.debug.JsonDeserializerReservationsResponse;
 import studio.helper.debug.ReservationsResponse;
 
@@ -97,6 +111,8 @@ import studio.helper.debug.ReservationsResponse;
  * @author dev
  */
 public class DashboardController implements Initializable {
+    
+    private Socket socket;
 
     Model model = Model.getInstance();
 
@@ -166,12 +182,16 @@ public class DashboardController implements Initializable {
     }
 
     @FXML
-    private void sendMessasge(MouseEvent event) {
+    private void sendMessasge(MouseEvent event) throws JSONException {
 
         String text = "";
         text = inputChat.getText();
         //{"type":"message", "message":"asasaaaaasdsadadsboss!"}
-        clientEndPoint.sendMessage("{\"type\":\"message\",\"message\":\"" + text + "\"}");
+        //clientEndPoint.sendMessage("{\"type\":\"message\",\"message\":\"" + text + "\"}");
+        System.out.println("Click send msg!");
+        JSONObject obj = new JSONObject();
+        obj.put("msg", text);
+        socket.emit("message", text);
 
     }
 
@@ -435,17 +455,8 @@ public class DashboardController implements Initializable {
             float f = Float.parseFloat(salP);
             series.getData().add(new XYChart.Data(i, f));
           }
-        
-//        series.getData().add(new XYChart.Data(1, 23));
-//        series.getData().add(new XYChart.Data(2, 14));
-//        series.getData().add(new XYChart.Data(3, 15));
-//        series.getData().add(new XYChart.Data(4, 24));
-//        series.getData().add(new XYChart.Data(5, 34));
-        
-        //cene scene2  = new Scene(lineChart,800,600);
+
         lineChart.getData().add(series);
-//        Node line = series.getNode().lookup(".chart-series-area-line");
-//        line.setStyle("-fx-stroke: rgba(" + Color.RED + ", 1.0);");
         lineChart.setLegendVisible(false);
         
         lineChart.setPrefSize(260, 200);
@@ -455,8 +466,6 @@ public class DashboardController implements Initializable {
         StackPane root2 = new StackPane();
         root2.getChildren().add(lineChart);
         charts.getChildren().add(root2);
-
-
         
         btnSendReservations.setDisable(true);
         LocalDate today = LocalDate.now();
@@ -605,11 +614,13 @@ public class DashboardController implements Initializable {
         table.setItems(data);
         table.getColumns().addAll(indexFieldCol, firstDayCol, lastSaleCol, lastHourCol);
 
-        try {
-            startWebsocketConenction();
-        } catch (DeploymentException | IOException | URISyntaxException ex) {
-            Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        try {
+//            startWebsocketConenction();
+//        } catch (DeploymentException | IOException | URISyntaxException ex) {
+//            Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+        
+        startWebSocketConnection2();
 
     }
 
@@ -732,97 +743,180 @@ public class DashboardController implements Initializable {
 
     }
 
-    private void startWebsocketConenction() throws DeploymentException, IOException, URISyntaxException {
+//    private void startWebsocketConenction() throws DeploymentException, IOException, URISyntaxException {
+//
+//        Task<Void> taskmain = new Task<Void>() {
+//            @Override
+//            public Void call() throws Exception {
+//
+//                Thread.sleep(1000);
+//                clientEndPoint = new WebsocketClientEndpoint(new URI(WEBSOCKET));
+//
+//                if (clientEndPoint.userSession != null) {
+//
+//                    //send modelname for socket auth
+//                    clientEndPoint.sendMessage(model.modelname);
+//
+//                    // add listener
+//                    clientEndPoint.addMessageHandler((String message) -> {
+//                        System.out.println(message);
+//                        Task<Void> task = new Task<Void>() {
+//                            @Override
+//                            public Void call() throws Exception {
+//                                Thread.sleep(100);
+//                                Gson gson = new Gson();
+//                                JsonElement data1 = gson.fromJson(message, JsonElement.class);
+//                                if (!data1.isJsonNull()) {
+//                                    String jsonType = data1.getAsJsonObject().get("type").getAsJsonPrimitive().getAsString();
+//                                    if (!jsonType.isEmpty()) {
+//                                        if (jsonType.equals("message")) {
+//                                            JsonObject jsonData = data1.getAsJsonObject().get("data").getAsJsonObject();
+//                                            JsonObject parameters = gson.fromJson(jsonData, JsonObject.class);
+//                                            String jText1 = parameters.get("text").getAsString();
+//                                            String jAuthor = parameters.get("author").getAsString();
+//                                            String jcolor = parameters.get("color").getAsString();
+//                                            int jtime = parameters.get("time").getAsInt();
+//                                            TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+//                                            Date time = Date.from(Instant.ofEpochSecond(jtime));
+//                                            messageType = "message";
+//                                            chatArea.appendText("\n" + time + "\n" + jAuthor + " : " + jText1);
+//                                            System.out.println(jText1);
+//                                        }
+//                                        if (jsonType.equals("notification")) {
+//                                            JsonObject jsonData = data1.getAsJsonObject().get("data").getAsJsonObject();
+//                                            JsonObject parameters = gson.fromJson(jsonData, JsonObject.class);
+//                                            messageType = "notification";
+//                                            jText = parameters.get("text").getAsString();
+//                                        }
+//                                        if (jsonType.equals("history")) {
+//
+//                                        }
+//                                    } else {
+//                                        //error
+//                                    }
+//                                }
+//                                return null;
+//                            }
+//                        };
+//                        task.setOnSucceeded(ee -> {
+//                            if ("notification".equals(messageType)) {
+//                                showNotification(jText);
+//                            }
+//
+//                        });
+//                        new Thread(task).start();
+//                    });
+//
+//                    clientEndPoint.addMessageHandlerTest((String message) -> {
+//                        System.out.println("socket closedddddddddd");
+//                        try {
+//                            startWebsocketConenction();
+//                        } catch (DeploymentException ex) {
+//                            Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
+//                        } catch (IOException ex) {
+//                            Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
+//                        } catch (URISyntaxException ex) {
+//                            Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
+//                        }
+//                    });
+//
+//            //end
+//                } else {
+//
+//                    startWebsocketConenction();
+//                }
+//
+//                return null;
+//            }
+//        };
+//        taskmain.setOnSucceeded(ee -> {
+//
+//        });
+//        new Thread(taskmain).start();
+//
+//    }
 
-        Task<Void> taskmain = new Task<Void>() {
+    private void startWebSocketConnection2() {
+        
+        
+ try {
+        String socketUrl = SOCKETIO;
+        HostnameVerifier hostnameVerifier = new HostnameVerifier() {
             @Override
-            public Void call() throws Exception {
-
-                Thread.sleep(1000);
-                clientEndPoint = new WebsocketClientEndpoint(new URI(WEBSOCKET));
-
-                if (clientEndPoint.userSession != null) {
-
-                    //send modelname for socket auth
-                    clientEndPoint.sendMessage(model.modelname);
-
-                    // add listener
-                    clientEndPoint.addMessageHandler((String message) -> {
-                        System.out.println(message);
-                        Task<Void> task = new Task<Void>() {
-                            @Override
-                            public Void call() throws Exception {
-                                Thread.sleep(100);
-                                Gson gson = new Gson();
-                                JsonElement data1 = gson.fromJson(message, JsonElement.class);
-                                if (!data1.isJsonNull()) {
-                                    String jsonType = data1.getAsJsonObject().get("type").getAsJsonPrimitive().getAsString();
-                                    if (!jsonType.isEmpty()) {
-                                        if (jsonType.equals("message")) {
-                                            JsonObject jsonData = data1.getAsJsonObject().get("data").getAsJsonObject();
-                                            JsonObject parameters = gson.fromJson(jsonData, JsonObject.class);
-                                            String jText1 = parameters.get("text").getAsString();
-                                            String jAuthor = parameters.get("author").getAsString();
-                                            String jcolor = parameters.get("color").getAsString();
-                                            int jtime = parameters.get("time").getAsInt();
-                                            TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-                                            Date time = Date.from(Instant.ofEpochSecond(jtime));
-                                            messageType = "message";
-                                            chatArea.appendText("\n" + time + "\n" + jAuthor + " : " + jText1);
-                                            System.out.println(jText1);
-                                        }
-                                        if (jsonType.equals("notification")) {
-                                            JsonObject jsonData = data1.getAsJsonObject().get("data").getAsJsonObject();
-                                            JsonObject parameters = gson.fromJson(jsonData, JsonObject.class);
-                                            messageType = "notification";
-                                            jText = parameters.get("text").getAsString();
-                                        }
-                                        if (jsonType.equals("history")) {
-
-                                        }
-                                    } else {
-                                        //error
-                                    }
-                                }
-                                return null;
-                            }
-                        };
-                        task.setOnSucceeded(ee -> {
-                            if ("notification".equals(messageType)) {
-                                showNotification(jText);
-                            }
-
-                        });
-                        new Thread(task).start();
-                    });
-
-                    clientEndPoint.addMessageHandlerTest((String message) -> {
-                        System.out.println("socket closedddddddddd");
-                        try {
-                            startWebsocketConenction();
-                        } catch (DeploymentException ex) {
-                            Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (IOException ex) {
-                            Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (URISyntaxException ex) {
-                            Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    });
-
-            //end
-                } else {
-
-                    startWebsocketConenction();
-                }
-
-                return null;
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
             }
         };
-        taskmain.setOnSucceeded(ee -> {
+        TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+            @Override
+            public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) {
 
-        });
-        new Thread(taskmain).start();
+            }
 
+            @Override
+            public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+
+            }
+
+            @Override
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                return new java.security.cert.X509Certificate[0];
+            }
+        }};
+        X509TrustManager trustManager = (X509TrustManager) trustAllCerts[0];
+
+        SSLContext sslContext = SSLContext.getInstance("SSL");
+        sslContext.init(null, trustAllCerts, null);
+        SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .hostnameVerifier(hostnameVerifier)
+                .sslSocketFactory(sslSocketFactory, trustManager)
+                .build();
+
+        IO.Options opts = new IO.Options();
+        opts.callFactory = okHttpClient;
+        opts.webSocketFactory = okHttpClient;
+        socket = IO.socket(socketUrl, opts);
+        
+        socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+
+                @Override
+                public void call(Object... args) {
+                    socket.emit("username", model.modelname);
+                    //socket.disconnect();
+                }
+
+            }).on("event", new Emitter.Listener() {
+
+                @Override
+                public void call(Object... args) {
+                    System.out.println("event: " + args);
+                }
+
+            }).on("broadcast", new Emitter.Listener() {
+                
+                @Override
+                public void call(Object... args) {
+                    System.out.println("broadcast: " + args);
+                }
+
+            }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
+
+                @Override
+                public void call(Object... args) {
+                }
+
+            });
+        
+    } catch (URISyntaxException e) {
+        throw new RuntimeException(e);
+    } catch (NoSuchAlgorithmException | KeyManagementException e) {
+        e.printStackTrace();
+    }
+         
+         socket.connect();
+    
     }
 
 }

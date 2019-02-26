@@ -19,7 +19,7 @@ public class Global {
     public static final String LOGIN_URL = DOMAIN+"/api/testlogin";
     public static final String RANDOM_MODELS = DOMAIN+"/api/randommodels";
     public static final String SEND_RESERVATIONS = DOMAIN+"/api/sendreservations";
-    public static final String WEBSOCKET = "ws://"+SHORT_DOMAIN_TEST;
+    public static final String SOCKETIO = "https://work.studio20.group:3000";
     
     public static final String DOWNLOAD_JCAM = "https://box.doclerholding.com/index.php/s/pjIhf3ZDh9uhUIM/authenticate";
     public static final String DOWNLOAD_SPLITER = "http://very-soft.com/media/products/distributions/wcs_1.6.339_setup_en.exe";
