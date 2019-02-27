@@ -44,6 +44,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.logging.Level;
@@ -93,6 +94,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.websocket.DeploymentException;
 import okhttp3.OkHttpClient;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
@@ -838,6 +840,9 @@ public class DashboardController implements Initializable {
 
     private void startWebSocketConnection2() {
         
+         String[] dataRegister = {model.modelname, "2"};
+         JSONArray mJSONArray = new JSONArray(Arrays.asList(dataRegister));
+
         
  try {
         String socketUrl = SOCKETIO;
@@ -883,7 +888,7 @@ public class DashboardController implements Initializable {
 
                 @Override
                 public void call(Object... args) {
-                    socket.emit("username", model.modelname);
+                    socket.emit("username", mJSONArray);
                     //socket.disconnect();
                 }
 
@@ -894,11 +899,11 @@ public class DashboardController implements Initializable {
                     System.out.println("event: " + args);
                 }
 
-            }).on("broadcast", new Emitter.Listener() {
+            }).on("chat", new Emitter.Listener() {
                 
                 @Override
                 public void call(Object... args) {
-                    System.out.println("broadcast: " + args);
+                    System.out.println("chat: " + args[0]);
                 }
 
             }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
