@@ -193,7 +193,7 @@ public class DashboardController implements Initializable {
         System.out.println("Click send msg!");
         JSONObject obj = new JSONObject();
         obj.put("msg", text);
-        socket.emit("message", text);
+        socket.emit("chat", text);
 
     }
 
@@ -904,6 +904,15 @@ public class DashboardController implements Initializable {
                 @Override
                 public void call(Object... args) {
                     System.out.println("chat: " + args[0]);
+                    String text = args[0].toString();
+                    chatArea.appendText("\n" + "10:20:23 PM" + "\n" + "Author" + " : " + text);
+                }
+
+            }).on("username", new Emitter.Listener() {
+                
+                @Override
+                public void call(Object... args) {
+                    System.out.println("username: " + args[0]);
                 }
 
             }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
